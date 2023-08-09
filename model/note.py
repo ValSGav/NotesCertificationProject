@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class Note:
 
     def __init__(self, note_id: int, title="", body="", date=datetime(1900, 1, 1)):
@@ -12,3 +13,6 @@ class Note:
         self.body = note.body
         self.title = note.title
         self.date = note.date
+
+    def __str__(self):
+        return self.title + " " + self.body + " " + str(self.date)
