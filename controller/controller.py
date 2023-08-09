@@ -19,17 +19,20 @@ def check_date(dateString: str) -> bool:
 
 class Controller:
 
-    def run(self):
-        notebook = Notebook()
-        saver = Saver(notebook)
-        view = View()
+    def __init__(self, view: View, saver: Saver, notebook: Notebook):
+        self.view = view
+        self.saver = saver
+        self.notebook = notebook
 
-        saver.load_note_book(db_name)
+    def run(self):
+
+
+        self.saver.load_note_book(db_name)
 
         isExit = False
 
         while not isExit:
-            answer = view.show_menu_get_answer("""
+            answer = self.view.show_menu_get_answer("""
             1- Add note
             2- Delete note
             3- Update Note
@@ -38,53 +41,53 @@ class Controller:
             """)
 
             if answer == 1:
-                title = view.get_string("Введите заголовок заметки: ")
-                body = view.get_string("Введите текст заметки: ")
-                notebook.add_note(title, body)
-                view.show_message("Заметка добавлена.")
-                saver.save_note_book(db_name)
+                title = self.view.get_string("Введите заголовок заметки: ")
+                body = self.view.get_string("Введите текст заметки: ")
+                self.notebook.add_note(title, body)
+                self.view.show_message("Заметка добавлена.")
+                self.saver.save_note_book(db_name)
             elif answer == 2:
                 try:
-                    id = int(view.get_string("Введите номер заметки для удаления: "))
-                    old_note = notebook.get_note(id)
+                    id = int(self.view.get_string("Введите номер заметки для удаления: "))
+                    old_note = self.notebook.get_note(id)
                     if old_note.note_id == 0:
-                        view.show_message(f"Не найдена заметка с номером {id}")
+                        self.view.show_message(f"Не найдена заметка с номером {id}")
                     else:
-                        notebook.delete_note(id)
-                        saver.save_note_book(db_name)
+                        self.notebook.delete_note(id)
+                        self.saver.save_note_book(db_name)
                 except ValueError as e:
                     print(e)
             elif answer == 3:
                 try:
-                    id = int(view.get_string("Введите номер заметки для обновления информации: "))
-                    old_note = notebook.get_note(id)
+                    id = int(self.view.get_string("Введите номер заметки для обновления информации: "))
+                    old_note = self.notebook.get_note(id)
                     if old_note.note_id == 0:
-                        view.show_message(f"Не найдена заметка с номером {id}")
+                        self.view.show_message(f"Не найдена заметка с номером {id}")
                     else:
-                        title = view.get_string("Введите  новый заголовок заметки: ")
-                        body = view.get_string("Введите новый текст заметки: ")
-                        notebook.update_note(id, Note(old_note.note_id, title, body, old_note.date))
-                        saver.save_note_book(db_name)
+                        title = self.view.get_string("Введите  новый заголовок заметки: ")
+                        body = self.view.get_string("Введите новый текст заметки: ")
+                        self.notebook.update_note(id, Note(old_note.note_id, title, body, old_note.date))
+                        self.saver.save_note_book(db_name)
                 except ValueError as e:
                     print(e)
             elif answer == 4:
                 try:
-                    dataStringMin = view.get_string("Введите дату начала отбора записей(в формате дд-мм-гггг)");
-                    dataStringMax = view.get_string("Введите дату окончания отбора записей(в формате дд-мм-гггг)");
+                    dataStringMin = self.view.get_string("Введите дату начала отбора записей(в формате дд-мм-гггг)");
+                    dataStringMax = self.view.get_string("Введите дату окончания отбора записей(в формате дд-мм-гггг)");
 
-                    if(check_date(dataStringMin) and check_date(dataStringMax)):
-                        dateMin = datetime.datetime.strptime(dataStringMin, '%d-%m-%Y')
-                        dateMax = datetime.datetime.strptime(dataStringMax, '%d-%m-%Y')
+                    if check_date(dataStringMin) and check_date(dataStringMax):
+                        date_min = datetime.datetime.strptime(dataStringMin, '%d-%m-%Y')
+                        date_max = datetime.datetime.strptime(dataStringMax, '%d-%m-%Y')
 
-                        dict_of_notes = notebook.get_notes(min_date=dateMin, max_time=dateMax)
+                        dict_of_notes = self.notebook.get_notes(min_date=date_min, max_time=date_max)
                         for key, val in dict_of_notes.items():
-                            view.show_message("{} - {}".format(key, val))
+                            self.view.show_message("{} - {}".format(key, val))
                     elif dataStringMin == "" and dataStringMax == "":
-                        dict_of_notes = notebook.get_notes()
+                        dict_of_notes = self.notebook.get_notes()
                         for key, val in dict_of_notes.items():
-                            view.show_message("{} - {}".format(key, val))
+                            self.view.show_message("{} - {}".format(key, val))
                     else:
-                        view.show_message("Даты должны соотвествовать формату дд-мм-гггг")
+                        self.view.show_message("Даты должны соотвествовать формату дд-мм-гггг")
                 except ValueError as e:
                     print(e)
             elif answer == 5:
